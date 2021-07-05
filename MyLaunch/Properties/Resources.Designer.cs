@@ -59,5 +59,348 @@ namespace MyLaunch.Properties {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   (アイコン) に類似した型 System.Drawing.Icon のローカライズされたリソースを検索します。
+        /// </summary>
+        internal static System.Drawing.Icon app {
+            get {
+                object obj = ResourceManager.GetObject("app", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   バージョン情報 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string Command_About {
+            get {
+                return ResourceManager.GetString("Command_About", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   グループを追加する に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string Command_AddGroup {
+            get {
+                return ResourceManager.GetString("Command_AddGroup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   項目を追加する に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string Command_AddLaunchItem {
+            get {
+                return ResourceManager.GetString("Command_AddLaunchItem", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   リンクを追加する に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string Command_AddLink {
+            get {
+                return ResourceManager.GetString("Command_AddLink", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   キャンセル に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string Command_Cancel {
+            get {
+                return ResourceManager.GetString("Command_Cancel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   作成者 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string Command_Creator {
+            get {
+                return ResourceManager.GetString("Command_Creator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   寄付する に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string Command_Donate {
+            get {
+                return ResourceManager.GetString("Command_Donate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   アプリケーションを終了する に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string Command_ExitApplication {
+            get {
+                return ResourceManager.GetString("Command_ExitApplication", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   区切り線を挿入する に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string Command_InsertSeparator {
+            get {
+                return ResourceManager.GetString("Command_InsertSeparator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   いいえ に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string Command_No {
+            get {
+                return ResourceManager.GetString("Command_No", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   OK に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string Command_OK {
+            get {
+                return ResourceManager.GetString("Command_OK", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   環境設定 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string Command_Preferences {
+            get {
+                return ResourceManager.GetString("Command_Preferences", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   この項目を削除する に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string Command_RemoveItem {
+            get {
+                return ResourceManager.GetString("Command_RemoveItem", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   リポジトリ に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string Command_Repository {
+            get {
+                return ResourceManager.GetString("Command_Repository", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   ディレクトリパスを選択する に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string Command_SelectDirectoryPath {
+            get {
+                return ResourceManager.GetString("Command_SelectDirectoryPath", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   ファイルパスを選択する に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string Command_SelectFilePath {
+            get {
+                return ResourceManager.GetString("Command_SelectFilePath", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   はい に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string Command_Yes {
+            get {
+                return ResourceManager.GetString("Command_Yes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   起動方法 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string Label_ActivateOn {
+            get {
+                return ResourceManager.GetString("Label_ActivateOn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   ファイルパス に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string Label_FileName {
+            get {
+                return ResourceManager.GetString("Label_FileName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   グループ に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string Label_Group {
+            get {
+                return ResourceManager.GetString("Label_Group", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   線の色 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string Label_LaunchBorderColor {
+            get {
+                return ResourceManager.GetString("Label_LaunchBorderColor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   線の太さ に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string Label_LaunchBorderSize {
+            get {
+                return ResourceManager.GetString("Label_LaunchBorderSize", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   ランチャー に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string Label_Launcher {
+            get {
+                return ResourceManager.GetString("Label_Launcher", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   表示項目設定 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string Label_LaunchItemSettings {
+            get {
+                return ResourceManager.GetString("Label_LaunchItemSettings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   ランチャー設定 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string Label_LaunchSettings {
+            get {
+                return ResourceManager.GetString("Label_LaunchSettings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   左クリック に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string Label_LeftClick {
+            get {
+                return ResourceManager.GetString("Label_LeftClick", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   リンク に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string Label_Link {
+            get {
+                return ResourceManager.GetString("Label_Link", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   名前 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string Label_Name {
+            get {
+                return ResourceManager.GetString("Label_Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   新しいグループ に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string Label_NewGroup {
+            get {
+                return ResourceManager.GetString("Label_NewGroup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   右クリック に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string Label_RightClick {
+            get {
+                return ResourceManager.GetString("Label_RightClick", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   区切り線 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string Label_Separator {
+            get {
+                return ResourceManager.GetString("Label_Separator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   線が表示される位置 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string Label_ShowLaunchBorder {
+            get {
+                return ResourceManager.GetString("Label_ShowLaunchBorder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   気に入って頂けましたら、継続開発のためのご寄付も歓迎いたします。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string Message_NotifyDonate {
+            get {
+                return ResourceManager.GetString("Message_NotifyDonate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   ランチャーに項目を追加しましょう。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string Text_LaunchItemSettingsHint {
+            get {
+                return ResourceManager.GetString("Text_LaunchItemSettingsHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   ランチャーに表示する項目を登録します。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string Text_LaunchItemSettingsTitle {
+            get {
+                return ResourceManager.GetString("Text_LaunchItemSettingsTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   ランチャーの設定を行います。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string Text_LaunchSettingsTitle {
+            get {
+                return ResourceManager.GetString("Text_LaunchSettingsTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   この項目は区切り線として表示されます。 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string Text_SeparatorHint {
+            get {
+                return ResourceManager.GetString("Text_SeparatorHint", resourceCulture);
+            }
+        }
     }
 }

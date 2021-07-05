@@ -1,13 +1,17 @@
-﻿using MyBase;
+﻿using Microsoft.Win32;
+using MyBase;
 using MyBase.Logging;
+using MyBase.Wpf.CommonDialogs;
 using Prism.Ioc;
 using Prism.Mvvm;
+using Prism.Services.Dialogs;
 using Prism.Unity;
 using QuickConverter;
 using System;
 using System.Diagnostics;
 using System.Text;
 using System.Windows;
+using Vanara.PInvoke;
 using WPFLocalizeExtension.Providers;
 
 namespace MyLaunch
@@ -30,7 +34,7 @@ namespace MyLaunch
         /// <summary>
         /// アプリケーションの共有情報を取得します。
         /// </summary>
-        public Models.SharedDataService SharedDataService { get; }
+        public SharedDataStore SharedDataStore { get; }
 
         /// <summary>
         /// このクラスの新しいインスタンスを生成します。
@@ -85,7 +89,7 @@ namespace MyLaunch
                     config.AddTarget(nameof(memory), memory);
                     config.LoggingRules.Add(new NLog.Config.LoggingRule("*", NLog.LogLevel.Trace, file));
                     config.LoggingRules.Add(new NLog.Config.LoggingRule("*", NLog.LogLevel.Trace, memory));
-                    config.Variables.Add("DIR", this.SharedDataService.LogDirectoryPath);
+                    config.Variables.Add("DIR", this.SharedDataStore.LogDirectoryPath);
                     return config;
                 },
                 CreateLoggerHook = (logger, category) =>
@@ -96,8 +100,9 @@ namespace MyLaunch
                 },
             });
             this.ProductInfo = new ProductInfo();
-            this.SharedDataService = new(this.Logger, this.ProductInfo, Process.GetCurrentProcess());
+            this.SharedDataStore = new(this.Logger, this.ProductInfo, Process.GetCurrentProcess());
             UnhandledExceptionObserver.Observe(this, this.Logger, this.ProductInfo);
+            SystemEvents.SessionEnding += this.SystemEvents_SessionEnding;
         }
 
         /// <summary>
@@ -110,37 +115,58 @@ namespace MyLaunch
             this.Logger.Log($"アプリケーションを開始しました。", Category.Info);
             this.Logger.Debug($" アプリケーションを開始しました。: Args=[{string.Join(", ", e.Args)}]");
 
+            var process = Process.GetCurrentProcess();
+            var handle = this.GetOtherProcessHandle(process);
+            if (handle.IsNull == false)
+            {
+                this.Shutdown(0);
+                return;
+            }
+
             Initializer.InitQuickConverter();
 
-            this.SharedDataService.CommandLineArgs = e.Args;
+            this.SharedDataStore.CommandLineArgs = e.Args;
 
             base.OnStartup(e);
         }
 
         /// <summary>
-        /// View から ViewModel を生成するための規則を定義します。
+        /// View と ViewModel のワイヤリングを構成します。
         /// </summary>
         [LogInterceptor]
         protected override void ConfigureViewModelLocator()
         {
-            ViewModelLocationProvider.SetDefaultViewModelFactory((view, viewModelType) => {
+            base.ConfigureViewModelLocator();
+
+            // ViewModel のファクトリ
+            ViewModelLocationProvider.SetDefaultViewModelFactory((view, viewModelType) =>
+            {
                 // 多言語化の初期設定を行う
                 if (view is DependencyObject obj)
                     Initializer.InitWPFLocalizeExtension(obj);
 
                 // ViewModel のインスタンスを生成する
-                var viewModel = this.Container.Resolve(viewModelType);
-                return viewModel;
+                return this.Container.Resolve(viewModelType);
             });
         }
 
         /// <summary>
-        /// DI コンテナに登録される型とインスタンスを定義します。
+        /// DI コンテナにオブジェクトを追加します。
         /// </summary>
         /// <param name="containerRegistry">DI コンテナ</param>
         [LogInterceptor]
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
+            // シングルトン
+            containerRegistry.RegisterInstance(this.Logger);
+            containerRegistry.RegisterInstance(this.ProductInfo);
+            containerRegistry.RegisterInstance(this.SharedDataStore);
+            containerRegistry.RegisterSingleton<Models.Settings>();
+            containerRegistry.RegisterSingleton<Models.LaunchItemSettings>();
+            containerRegistry.RegisterSingleton<ICommonDialogService, CommonDialogService>();
+
+            // ダイアログ
+            containerRegistry.RegisterDialogWindow<DialogWindowWrapper>();
         }
 
         /// <summary>
@@ -150,8 +176,16 @@ namespace MyLaunch
         [LogInterceptor]
         protected override Window CreateShell()
         {
-            var shell = this.Container.Resolve<Views.MainWindow>();
-            shell.Title = this.SharedDataService.Identifier;
+            var (_, settings) = this.Container.Resolve<Models.Settings>().Load();
+            var (_, launchItemSettings) = this.Container.Resolve<Models.LaunchItemSettings>().Load();
+
+            var shell = this.Container.Resolve<Views.Workspace>();
+            shell.Title = this.SharedDataStore.Identifier;
+            shell.Closed += (sender, e) =>
+            {
+                settings.Save();
+                launchItemSettings.Save();
+            };
             return shell;
         }
 
@@ -163,15 +197,98 @@ namespace MyLaunch
         protected override void OnExit(ExitEventArgs e)
         {
             base.OnExit(e);
+            SystemEvents.SessionEnding -= this.SystemEvents_SessionEnding;
             this.Logger.Log($"アプリケーションを終了しました。", Category.Info);
             this.Logger.Debug($"アプリケーションを終了しました。: ExitCode={e.ApplicationExitCode}");
         }
+
+        /// <summary>
+        /// ユーザがサインアウトまたはシャットダウンするときに行う処理を定義します。
+        /// </summary>
+        /// <param name="sender">イベントの発生源</param>
+        /// <param name="e">イベントの情報</param>
+        [LogInterceptor]
+        private void SystemEvents_SessionEnding(object sender, SessionEndingEventArgs e)
+        {
+            switch (e.Reason)
+            {
+                case SessionEndReasons.Logoff:
+                    this.Logger.Log($"ユーザがサインアウトしようとしています。OS によってアプリケーションは強制終了されます。", Category.Info);
+                    break;
+                case SessionEndReasons.SystemShutdown:
+                    this.Logger.Log($"ユーザがシャットダウンしようとしています。OS によってアプリケーションは強制終了されます。", Category.Info);
+                    break;
+            }
+            this.Logger.Debug($"ユーザが OS のセッションを終了しようとしています。OS によってアプリケーションは強制終了されます。: SessionEndReasons={e.Reason}");
+        }
+
+        /// <summary>
+        /// 別プロセスで起動中の同一アプリケーションのウィンドウハンドルを取得します。
+        /// </summary>
+        /// <param name="sourceProcess">比較元のプロセス</param>
+        /// <returns>ウィンドウハンドル</returns>
+        [LogInterceptor]
+        private HWND GetOtherProcessHandle(Process sourceProcess)
+        {
+            // 本アプリはタスクバー上の通知アイコンを内包した仮ウィンドウが MainWindow に指定されている。
+            // このウィンドウは描画されないため Process.MainWindowHandle からハンドルを取得できない。
+            // すべてのハンドルを列挙し、ウィンドウテキストが一致するハンドルから特定する。
+
+            var (hWnd, lpdwProcessId) = (HWND.NULL, 0u);
+            var result = User32.EnumWindows(new User32.EnumWindowsProc((_hWnd, _) =>
+            {
+                try
+                {
+                    // プロセスの情報を比較する
+                    User32.GetWindowThreadProcessId(_hWnd, out var _lpdwProcessId);
+                    var process = Process.GetProcessById((int)_lpdwProcessId);
+                    if (sourceProcess.Id == _lpdwProcessId)
+                        return true;
+                    if (sourceProcess.ProcessName != process.ProcessName)
+                        return true;
+
+                    // ウィンドウテキストを比較する
+                    // 本アプリケーションでは実質的に識別子として使用される
+                    var lpString = new StringBuilder(256);
+                    User32.GetWindowText(_hWnd, lpString, lpString.Capacity);
+                    if (lpString.ToString().Contains(this.SharedDataStore.Identifier) == false)
+                        return true;
+
+                    // ハンドルを保持する
+                    (hWnd, lpdwProcessId) = (_hWnd, _lpdwProcessId);
+                    return false;
+                }
+                catch
+                {
+                    return true;
+                }
+            }), IntPtr.Zero);
+
+            if (result)
+                this.Logger.Debug($"起動中の同一アプリケーションは存在しませんでした。: ProcessName={sourceProcess?.ProcessName}");
+            else
+                this.Logger.Debug($"起動中の同一アプリケーションのウィンドウハンドルを取得しました。: ProcessName={sourceProcess?.ProcessName}, lpdwProcessID={lpdwProcessId}, hWnd=0x{hWnd.DangerousGetHandle():X)}");
+            return hWnd;
+        }
+
 
         /// <summary>
         /// 初期化処理を行うためのメソッドを提供します。
         /// </summary>
         private static class Initializer
         {
+            /// <summary>
+            /// 指定された View のインスタンスに対する <see cref="WPFLocalizeExtension"/> の初期設定を行います。
+            /// </summary>
+            /// <param name="view">View のインスタンス</param>
+            [LogInterceptor]
+            public static void InitWPFLocalizeExtension(DependencyObject view)
+            {
+                var assemblyName = view.GetType().Assembly.GetName().Name;
+                ResxLocalizationProvider.SetDefaultAssembly(view, assemblyName);
+                ResxLocalizationProvider.SetDefaultDictionary(view, $"{assemblyName}.Properties.Resources");
+            }
+
             /// <summary>
             /// <see cref="QuickConverter"/> の初期設定を行います。
             /// </summary>
@@ -195,16 +312,35 @@ namespace MyLaunch
                 EquationTokenizer.AddExtensionMethods(typeof(System.Linq.Enumerable));           // System.Linq             : System.Linq.dll
 #pragma warning restore IDE0049
             }
+        }
+
+        /// <summary>
+        /// Prism によって表示されるダイアログウィンドウの基底クラスを置き換えます。
+        /// </summary>
+        private class DialogWindowWrapper : MahApps.Metro.Controls.MetroWindow, IDialogWindow
+        {
+            IDialogResult IDialogWindow.Result { get; set; }
 
             /// <summary>
-            /// 指定された View のインスタンスに対する <see cref="WPFLocalizeExtension"/> の初期設定を行います。
+            /// このクラスの新しいインスタンスを生成します。
             /// </summary>
-            /// <param name="view">View のインスタンス</param>
             [LogInterceptor]
-            public static void InitWPFLocalizeExtension(DependencyObject view)
+            public DialogWindowWrapper()
             {
-                ResxLocalizationProvider.SetDefaultAssembly(view, nameof(MyLaunch));
-                ResxLocalizationProvider.SetDefaultDictionary(view, nameof(MyLaunch.Properties.Resources));
+                this.Loaded += this.Window_Loaded;
+            }
+
+            /// <summary>
+            /// ウィンドウがロードされたときに行う処理を定義します。
+            /// </summary>
+            /// <param name="sender">イベントの発生源</param>
+            /// <param name="e">イベントの情報</param>
+            [LogInterceptor]
+            private void Window_Loaded(object sender, RoutedEventArgs e)
+            {
+                if (this.DataContext is IDialogAware dialogAware)
+                    this.Title = dialogAware.Title;
+                this.Loaded -= this.Window_Loaded;
             }
         }
     }

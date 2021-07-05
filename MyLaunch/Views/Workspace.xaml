@@ -1,0 +1,39 @@
+﻿<Window x:Class="MyLaunch.Views.Workspace"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:p="http://prismlibrary.com/"
+        xmlns:m="http://metro.mahapps.com/winfx/xaml/controls"
+        xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:le="http://wpflocalizeextension.codeplex.com"
+        xmlns:qc="http://QuickConverter.CodePlex.com/"
+        xmlns:ge="clr-namespace:SourceChord.GridExtra;assembly=GridExtra.Wpf"
+        xmlns:t="http://www.hardcodet.net/taskbar"
+        mc:Ignorable="d"
+        p:ViewModelLocator.AutoWireViewModel="True"
+        Height="0" Width="0" ResizeMode="NoResize" WindowStyle="None" ShowInTaskbar="False"
+        Loaded="Window_Loaded" Closing="Window_Closing" Closed="Window_Closed" DataContextChanged="Window_DataContextChanged">
+
+    <t:TaskbarIcon IconSource="/Resources/app.ico"
+                   ToolTipText="{Binding ProductInfo.Product, Mode=OneWay}"
+                   Visibility="Visible"
+                   TrayMouseDoubleClick="TaskbarIcon_TrayMouseDoubleClick">
+        <t:TaskbarIcon.ContextMenu>
+            <ContextMenu>
+                <MenuItem Click="Preferences_Click" Header="{le:Loc Command_Preferences}">
+                    <MenuItem.Icon>
+                        <md:PackIcon Kind="Cog"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Command="{Binding ExitApplicationCommand, Mode=OneTime}" Header="{le:Loc Command_ExitApplication}">
+                    <MenuItem.Icon>
+                        <md:PackIcon Kind="Close"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+            </ContextMenu>
+        </t:TaskbarIcon.ContextMenu>
+    </t:TaskbarIcon>
+
+</Window>
