@@ -1,0 +1,73 @@
+﻿<Window x:Class="MyLaunch.Views.LaunchBorderWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:p="http://prismlibrary.com/"
+        xmlns:m="http://metro.mahapps.com/winfx/xaml/controls"
+        xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:le="http://wpflocalizeextension.codeplex.com"
+        xmlns:qc="http://QuickConverter.CodePlex.com/"
+        xmlns:ge="clr-namespace:SourceChord.GridExtra;assembly=GridExtra.Wpf"
+        xmlns:launchItems="clr-namespace:MyLaunch.Models.LaunchItems"
+        xmlns:behaviors="clr-namespace:MyLaunch.Views.Behaviors"
+        xmlns:helpers="clr-namespace:MyLaunch.Views.Helpers"
+        mc:Ignorable="d"
+        p:ViewModelLocator.AutoWireViewModel="True"
+        Topmost="True" WindowState="Maximized" ResizeMode="NoResize" WindowStyle="None" ShowInTaskbar="False"
+        AllowsTransparency="True" Background="Transparent">
+
+    <Grid ge:GridEx.RowDefinition="Auto, *, Auto" ge:GridEx.ColumnDefinition="Auto, *, Auto">
+        <Grid.Resources>
+            <helpers:BindingProxy x:Key="Proxy" Data="{Binding Mode=OneWay}"/>
+            <Image x:Key="LinkImage" x:Shared="False" Source="{Binding Image, Mode=OneWay}"/>
+
+            <Style x:Key="LaunchBorder" TargetType="{x:Type Border}">
+                <Setter Property="behaviors:LaunchBorderAttachedBehavior.Enabled" Value="True"/>
+                <Setter Property="ContextMenu">
+                    <Setter.Value>
+                        <ContextMenu ItemsSource="{Binding Data.LaunchItemSettings.Items, Mode=OneWay, Source={StaticResource Proxy}}">
+                            <ContextMenu.Resources>
+                                <HierarchicalDataTemplate DataType="{x:Type launchItems:Group}" ItemsSource="{Binding Children}"/>
+                                <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource MaterialDesignMenuItem}">
+                                    <Setter Property="Header" Value="{qc:Binding 'Path.GetFileName($P)', P={Binding FileName, Mode=OneWay}}"/>
+                                    <Setter Property="ToolTip" Value="{Binding FileName, Mode=OneWay}"/>
+                                    <Setter Property="Icon" Value="{StaticResource LinkImage}"/>
+                                    <Setter Property="behaviors:LaunchMenuItemAttachedBehavior.Enabled" Value="True"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Kind}" Value="Separator">
+                                            <Setter Property="Template">
+                                                <Setter.Value>
+                                                    <ControlTemplate TargetType="{x:Type MenuItem}">
+                                                        <Separator Margin="5"/>
+                                                    </ControlTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ContextMenu.Resources>
+                        </ContextMenu>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            
+            <Style x:Key="Vertical" TargetType="{x:Type Border}" BasedOn="{StaticResource LaunchBorder}">
+                <Setter Property="Width" Value="{Binding Settings.LaunchBorderSize, Mode=OneWay}"/>
+                <Setter Property="Background" Value="{Binding Settings.LaunchBorderColorBrush, Mode=OneWay}"/>
+            </Style>
+
+            <Style x:Key="Horizontal" TargetType="{x:Type Border}" BasedOn="{StaticResource LaunchBorder}">
+                <Setter Property="Height" Value="{Binding Settings.LaunchBorderSize, Mode=OneWay}"/>
+                <Setter Property="Background" Value="{Binding Settings.LaunchBorderColorBrush, Mode=OneWay}"/>
+            </Style>
+        </Grid.Resources>
+
+        <Border Style="{StaticResource Vertical}"   Visibility="{qc:Binding '$P ? Visibility.Visible : Visibility.Collapsed', P={Binding Settings.ShowLaunchBorderLeft, Mode=OneWay}}" Grid.Column="0" Grid.RowSpan="3" HorizontalAlignment="Left"/>
+        <Border Style="{StaticResource Vertical}"   Visibility="{qc:Binding '$P ? Visibility.Visible : Visibility.Collapsed', P={Binding Settings.ShowLaunchBorderRight, Mode=OneWay}}" Grid.Column="2" Grid.RowSpan="3" HorizontalAlignment="Right"/>
+        <Border Style="{StaticResource Horizontal}" Visibility="{qc:Binding '$P ? Visibility.Visible : Visibility.Collapsed', P={Binding Settings.ShowLaunchBorderTop, Mode=OneWay}}" Grid.Row="0" Grid.ColumnSpan="3" VerticalAlignment="Top"/>
+        <Border Style="{StaticResource Horizontal}" Visibility="{qc:Binding '$P ? Visibility.Visible : Visibility.Collapsed', P={Binding Settings.ShowLaunchBorderBottom, Mode=OneWay}}" Grid.Row="2" Grid.ColumnSpan="3" VerticalAlignment="Bottom"/>
+    </Grid>
+
+</Window>
